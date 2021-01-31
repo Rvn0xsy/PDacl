@@ -2,7 +2,7 @@
 
 Play Doh Windows ACL Tools
 
-相关阅读：
+相关阅读：[Windows权限控制相关的防御与攻击技术](https://payloads.online/archivers/2021-01-31/1)
 
 ## Introduction
 
