@@ -124,6 +124,8 @@ std::map<std::string, INT> ServiceRightsMap{
     {"Generic-Execute", GENERIC_EXECUTE},
 };
 
+
+
 HRESULT ADSetExtendedRight(IADs* pObject,
     LPWSTR pwszRightsGUID,
     LONG lAccessType,
@@ -601,6 +603,18 @@ BOOL ModifyServiceACL(LPTSTR ServiceName, LPTSTR Username, DWORD dwGrantAccess, 
     return TRUE;
 }
 
+typedef struct ADOptions {
+    std::string sActiveDirectoryExtendedRight = "";
+    std::string sActiveDirectoryUser = "";
+    std::string sLdapPath = "";
+    bool isActiveDirectoryAddRight = false;
+    bool isActiveDirectoryRemoveRight = false;
+    bool isListActiveDirectoryExtendedRights = false;
+    std::string sActiveDirectoryRight = "";
+    bool isActiveDirectoryRights = false;
+    bool isListActiveDirectoryRights = false;
+};
+
 int main(int argc, char* argv[])
 {
     CLI::App app{ "Play Doh Windows ACL Tools. - By Rvn0xsy\n[@] Blog : https://payloads.online/" };
@@ -608,21 +622,18 @@ int main(int argc, char* argv[])
     app.require_subcommand(1);
 
     // [ActiveDirectory]
-    std::string sActiveDirectoryExtendedRight = "";
+    ADOptions* AD_options = new ADOptions();
     
-    std::string sActiveDirectoryUser = "";
-    std::string sLdapPath = "";
-    bool isActiveDirectoryAddRight = false;
-    bool isActiveDirectoryRemoveRight = false;
-    bool isListActiveDirectoryExtendedRights = false;
+    
+   
     auto ActiveDirectoryExtendRights = app.add_subcommand("AD-ExtendRights", "ActiveDirectory ExtendRights");
     // ActiveDirectory->add_option("-h,--help", sActiveDirectoryExtendedRight, "ActiveDirectory ExtendedRight");
-    ActiveDirectoryExtendRights->add_flag("-a,--add", isActiveDirectoryAddRight, "Add Right to Object.");
-    ActiveDirectoryExtendRights->add_flag("-r,--remove", isActiveDirectoryRemoveRight, "Remove ActiveDirectory ExtendedRight");
-    ActiveDirectoryExtendRights->add_option("-u,--user", sActiveDirectoryUser, "Username,e.g. DomainName\\Rvn0xsy.");
-    ActiveDirectoryExtendRights->add_option("-e,--extended-right", sActiveDirectoryExtendedRight, "ActiveDirectory ExtendedRight");
-    ActiveDirectoryExtendRights->add_option("-s,--server", sLdapPath, "ActiveDirectory Server LDAP Path.");
-    ActiveDirectoryExtendRights->add_flag("-l,--list", isListActiveDirectoryExtendedRights, "List All ActiveDirectory ExtendedRights .");
+    ActiveDirectoryExtendRights->add_flag("-a,--add", AD_options->isActiveDirectoryAddRight, "Add Right to Object.");
+    ActiveDirectoryExtendRights->add_flag("-r,--remove", AD_options->isActiveDirectoryRemoveRight, "Remove ActiveDirectory ExtendedRight");
+    ActiveDirectoryExtendRights->add_option("-u,--user", AD_options->sActiveDirectoryUser, "Username,e.g. DomainName\\Rvn0xsy.");
+    ActiveDirectoryExtendRights->add_option("-e,--extended-right", AD_options->sActiveDirectoryExtendedRight, "ActiveDirectory ExtendedRight");
+    ActiveDirectoryExtendRights->add_option("-s,--server", AD_options->sLdapPath, "ActiveDirectory Server LDAP Path.");
+    ActiveDirectoryExtendRights->add_flag("-l,--list", AD_options->isListActiveDirectoryExtendedRights, "List All ActiveDirectory ExtendedRights .");
 
 
     ActiveDirectoryExtendRights->callback([&]() {
@@ -630,7 +641,7 @@ int main(int argc, char* argv[])
         HRESULT hr = NULL;
         IADs* pObject = NULL;
 
-        if (isListActiveDirectoryExtendedRights) {
+        if (AD_options->isListActiveDirectoryExtendedRights) {
             std::cout << "[*] ActiveDirectory Extended Rights : " << std::endl;
 
             for (auto& right : ADExtendedRightsMap) {
@@ -639,7 +650,7 @@ int main(int argc, char* argv[])
             return 0;
         }
 
-        if (ADExtendedRightsMap.find(sActiveDirectoryExtendedRight) == ADExtendedRightsMap.end()) {
+        if (ADExtendedRightsMap.find(AD_options->sActiveDirectoryExtendedRight) == ADExtendedRightsMap.end()) {
             std::cout << "[*] Not Found ActiveDirectoryExtendedRight ." << std::endl;
             std::cout << "[+] Example :" << std::endl;
             std::cout << "[+] Help : PDAcl.exe AD -h" << std::endl;
@@ -656,8 +667,8 @@ int main(int argc, char* argv[])
             return 0;
         }
 
-        std::cout << "[*] ActiveDirectoryExtended Right: " << sActiveDirectoryExtendedRight << std::endl;
-        if (sActiveDirectoryExtendedRight.empty() || sLdapPath.empty() || sActiveDirectoryUser.empty()) {
+        std::cout << "[*] ActiveDirectoryExtended Right: " << AD_options->sActiveDirectoryExtendedRight << std::endl;
+        if (AD_options->sActiveDirectoryExtendedRight.empty() || AD_options->sLdapPath.empty() || AD_options->sActiveDirectoryUser.empty()) {
             std::cout << "[*] Not Input ActiveDirectoryExtendedRight Or LDAP Path Or Username." << std::endl;
             std::cout << app.help() << std::endl;
             return 0;
@@ -666,11 +677,11 @@ int main(int argc, char* argv[])
         // 获取LDAP路径
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
         std::wstring ADsPath(L"LDAP://");
-        ADsPath.append(converter.from_bytes(sLdapPath));
+        ADsPath.append(converter.from_bytes(AD_options->sLdapPath));
         std::wstring wsActiveDirectoryUser;
-        wsActiveDirectoryUser.append(converter.from_bytes(sActiveDirectoryUser));
+        wsActiveDirectoryUser.append(converter.from_bytes(AD_options->sActiveDirectoryUser));
 
-        std::cout << "[*] Server : " << sLdapPath << std::endl;
+        std::cout << "[*] Server : " << AD_options->sLdapPath << std::endl;
         hr = ADsGetObject(ADsPath.c_str(), IID_IADs, (void**)&pObject);
 
 
@@ -678,29 +689,29 @@ int main(int argc, char* argv[])
             std::cout << "[*] ADsGetObject Error : " << hr << std::endl;
             return 0;
         }
-        if (isActiveDirectoryAddRight) {
-            std::cout << "[*] Add Right : " << sActiveDirectoryExtendedRight << std::endl;
+        if (AD_options->isActiveDirectoryAddRight) {
+            std::cout << "[*] Add Right : " << AD_options->sActiveDirectoryExtendedRight << std::endl;
         }
-        else if (isActiveDirectoryRemoveRight) {
-            std::cout << "[*] Remove Right : " << sActiveDirectoryExtendedRight << std::endl;
+        else if (AD_options->isActiveDirectoryRemoveRight) {
+            std::cout << "[*] Remove Right : " << AD_options->sActiveDirectoryExtendedRight << std::endl;
         }
         // 修改权限
         hr = ADSetExtendedRight(
             pObject,
-            (LPWSTR)ADExtendedRightsMap[sActiveDirectoryExtendedRight].data(),
+            (LPWSTR)ADExtendedRightsMap[AD_options->sActiveDirectoryExtendedRight].data(),
             ADS_ACETYPE_ACCESS_ALLOWED_OBJECT,
             ADS_ACEFLAG_INHERIT_ACE,
             NULL,
             (LPWSTR)wsActiveDirectoryUser.data(),
-            isActiveDirectoryAddRight
+            AD_options->isActiveDirectoryAddRight
         );
 
         if (!SUCCEEDED(hr)) {
-            std::cout << "[*] Modfiy ActiveDirectoryExtendedRight Failed " << sActiveDirectoryExtendedRight << " right : " << hr << std::endl;
+            std::cout << "[*] Modfiy ActiveDirectoryExtendedRight Failed " << AD_options->sActiveDirectoryExtendedRight << " right : " << hr << std::endl;
             std::cout << "[*] Return Error : " << hr << std::endl;
         }
         else {
-            std::cout << "[*] Modfiy ActiveDirectoryExtendedRight Success " << sActiveDirectoryExtendedRight << " extended right!!! " << std::endl;
+            std::cout << "[*] Modfiy ActiveDirectoryExtendedRight Success " << AD_options->sActiveDirectoryExtendedRight << " extended right!!! " << std::endl;
         }
 
         // Release the object.
@@ -713,33 +724,33 @@ int main(int argc, char* argv[])
 
 
     // [ActiveDirectory Rights]
-    std::string sActiveDirectoryRight = "";
-    bool isActiveDirectoryRights = false;
-    bool isListActiveDirectoryRights = false;
+    
+
     auto ActiveDirectoryRights = app.add_subcommand("AD-Rights", "ActiveDirectory Rights");
     
-    ActiveDirectoryRights->add_flag("-a,--add", isActiveDirectoryAddRight, "Add Right to Object.");
-    ActiveDirectoryRights->add_flag("-r,--remove", isActiveDirectoryRemoveRight, "Remove ActiveDirectory Right");
-    ActiveDirectoryRights->add_option("-u,--user", sActiveDirectoryUser, "Username,e.g. DomainName\\Rvn0xsy.");
-    ActiveDirectoryRights->add_option("-e,--extended-right", sActiveDirectoryRight, "ActiveDirectory Right");
-    ActiveDirectoryRights->add_option("-s,--server", sLdapPath, "ActiveDirectory Server LDAP Path.");
-    ActiveDirectoryRights->add_flag("-l,--list", isListActiveDirectoryRights, "List All ActiveDirectory Rights .");
+    ActiveDirectoryRights->add_flag("-a,--add", AD_options->isActiveDirectoryAddRight, "Add Right to Object.");
+    ActiveDirectoryRights->add_flag("-r,--remove", AD_options->isActiveDirectoryRemoveRight, "Remove ActiveDirectory Right");
+    ActiveDirectoryRights->add_option("-u,--user", AD_options->sActiveDirectoryUser, "Username,e.g. DomainName\\Rvn0xsy.");
+    ActiveDirectoryRights->add_option("-e,--extended-right", AD_options->sActiveDirectoryRight, "ActiveDirectory Right");
+    ActiveDirectoryRights->add_option("-s,--server", AD_options->sLdapPath, "ActiveDirectory Server LDAP Path.");
+    ActiveDirectoryRights->add_flag("-l,--list", AD_options->isListActiveDirectoryRights, "List All ActiveDirectory Rights .");
 
     ActiveDirectoryRights->callback([&]() {
 
         HRESULT hr = NULL;
         IADs* pObject = NULL;
 
-        if (isListActiveDirectoryRights) {
+        if (AD_options->isListActiveDirectoryRights) {
             std::cout << "[*] ActiveDirectory Rights : " << std::endl;
-
+            auto index = 0;
             for (auto& right : ADRightsMap) {
-                std::cout << "[*] " << right.first << std::endl;
+                std::cout << "["  << index << "]\t" << right.first << std::endl;
+                index++;
             }
             return 0;
         }
 
-        if (ADRightsMap.find(sActiveDirectoryRight) == ADRightsMap.end()) {
+        if (ADRightsMap.find(AD_options->sActiveDirectoryRight) == ADRightsMap.end()) {
             std::cout << "[*] Not Found ActiveDirectory Right ." << std::endl;
             std::cout << "[+] Example :" << std::endl;
             std::cout << "[+] Help : PDAcl.exe AD -h" << std::endl;
@@ -756,8 +767,8 @@ int main(int argc, char* argv[])
             return 0;
         }
 
-        std::cout << "[*] ActiveDirectory Right: " << sActiveDirectoryRight << std::endl;
-        if (sActiveDirectoryRight.empty() || sLdapPath.empty() || sActiveDirectoryUser.empty()) {
+        std::cout << "[*] ActiveDirectory Right: " << AD_options->sActiveDirectoryRight << std::endl;
+        if (AD_options->sActiveDirectoryRight.empty() || AD_options->sLdapPath.empty() || AD_options->sActiveDirectoryUser.empty()) {
             std::cout << "[*] Not Input ActiveDirectoryRight Or LDAP Path Or Username." << std::endl;
             std::cout << app.help() << std::endl;
             return 0;
@@ -766,11 +777,11 @@ int main(int argc, char* argv[])
         // 获取LDAP路径
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
         std::wstring ADsPath(L"LDAP://");
-        ADsPath.append(converter.from_bytes(sLdapPath));
+        ADsPath.append(converter.from_bytes(AD_options->sLdapPath));
         std::wstring wsActiveDirectoryUser;
-        wsActiveDirectoryUser.append(converter.from_bytes(sActiveDirectoryUser));
+        wsActiveDirectoryUser.append(converter.from_bytes(AD_options->sActiveDirectoryUser));
 
-        std::cout << "[*] Server : " << sLdapPath << std::endl;
+        std::cout << "[*] Server : " << AD_options->sLdapPath << std::endl;
         hr = ADsGetObject(ADsPath.c_str(), IID_IADs, (void**)&pObject);
 
 
@@ -778,31 +789,31 @@ int main(int argc, char* argv[])
             std::cout << "[*] ADsGetObject Error : " << hr << std::endl;
             return 0;
         }
-        if (isActiveDirectoryAddRight) {
-            std::cout << "[*] Add Right : " << sActiveDirectoryRight << std::endl;
+        if (AD_options->isActiveDirectoryAddRight) {
+            std::cout << "[*] Add Right : " << AD_options->sActiveDirectoryRight << std::endl;
         }
-        else if (isActiveDirectoryRemoveRight) {
-            std::cout << "[*] Remove Right : " << sActiveDirectoryRight << std::endl;
+        else if (AD_options->isActiveDirectoryRemoveRight) {
+            std::cout << "[*] Remove Right : " << AD_options->sActiveDirectoryRight << std::endl;
         }
 
         // 修改权限
         hr = ADSetRight(
             pObject,
-            ADRightsMap[sActiveDirectoryRight],
+            ADRightsMap[AD_options->sActiveDirectoryRight],
             ADS_ACETYPE_ACCESS_ALLOWED_OBJECT,
             ADS_ACEFLAG_INHERIT_ACE,
             NULL,
             NULL,
             (LPWSTR)wsActiveDirectoryUser.data(),
-            isActiveDirectoryAddRight
+            AD_options->isActiveDirectoryAddRight
         );
 
         if (!SUCCEEDED(hr)) {
-            std::cout << "[*] Modfiy ActiveDirectory Right Failed " << sActiveDirectoryRight << " right : " << hr << std::endl;
+            std::cout << "[*] Modfiy ActiveDirectory Right Failed " << AD_options->sActiveDirectoryRight << " right : " << hr << std::endl;
             std::cout << "[*] Return Error : " << hr << ", Error : " << GetLastError() << std::endl;
         }
         else {
-            std::cout << "[*] Modfiy ActiveDirectory Right Success " << sActiveDirectoryRight << " extended right!!! " << std::endl;
+            std::cout << "[*] Modfiy ActiveDirectory Right Success " << AD_options->sActiveDirectoryRight << " extended right!!! " << std::endl;
         }
 
         // Release the object.
