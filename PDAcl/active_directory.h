@@ -1,4 +1,17 @@
 #pragma once
+#include <iads.h>
+#include <comutil.h>
+#include <atlbase.h>
+#include <adshlp.h>
+#include <string>
+#include <iostream>
+#include <string>
+#include <map>
+#include <AccCtrl.h>
+#include <AclAPI.h>
+#include <comdef.h>
+#include <wincred.h>
+#include <codecvt>
 
 #define ABANDON_REPLICATION L"{ee914b82-0a98-11d1-adbb-00c04fd8d5cd}"
 #define ADD_GUID L"{440820ad-65b4-11d1-a3da-0000f875ae0d}"
@@ -56,3 +69,42 @@
 #define UPDATE_SCHEMA_CACHE L"{be2bb760-7f46-11d2-b9ad-00c04f79f805}"
 #define USER_CHANGE_PASSWORD L"{ab721a53-1e2f-11d0-9819-00aa0040529b}"
 #define USER_FORCE_CHANGE_PASSWORD L"{00299570-246d-11d0-a768-00aa006e0529}"
+
+
+
+typedef struct ADOptions {
+    std::string sActiveDirectoryExtendedRight = "";
+    std::string sActiveDirectoryUser = "";
+    std::string sLdapPath = "";
+    bool isActiveDirectoryAddRight = false;
+    bool isActiveDirectoryRemoveRight = false;
+    bool isListActiveDirectoryExtendedRights = false;
+    std::string sActiveDirectoryRight = "";
+    bool isActiveDirectoryRights = false;
+    bool isListActiveDirectoryRights = false;
+};
+
+
+HRESULT ADSetRight(
+    IADs* pObject,
+    long lAccessMask,
+    long lAccessType,
+    long lAccessInheritFlags,
+    LPOLESTR szObjectGUID,
+    LPOLESTR szInheritedObjectGUID,
+    LPOLESTR szTrustee,
+    BOOL bAddOrRemove
+);
+
+HRESULT ADSetExtendedRight(IADs* pObject,
+    LPWSTR pwszRightsGUID,
+    LONG lAccessType,
+    LONG fInheritanceFlags,
+    LONG fAppliesToObjectType,
+    LPWSTR pwszTrustee,
+    BOOL bAddOrRemove
+);
+
+VOID ActiveDirectoryExtendRightsCallBack(ADOptions* Options);
+
+VOID ActiveDirectoryRightsCallBack(ADOptions* Options);

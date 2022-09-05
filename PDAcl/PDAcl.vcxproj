@@ -142,11 +142,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="active_directory.cpp" />
     <ClCompile Include="PDAcl.cpp" />
+    <ClCompile Include="service.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ADExtendedRight.h" />
+    <ClInclude Include="active_directory.h" />
     <ClInclude Include="CLI11.hpp" />
+    <ClInclude Include="service.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
