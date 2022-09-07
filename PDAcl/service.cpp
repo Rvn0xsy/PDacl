@@ -148,6 +148,12 @@ BOOL ModifyServiceACL(LPTSTR ServiceName, LPTSTR Username, DWORD dwGrantAccess, 
 
 VOID ServiceCallBack(ServiceOptions* Options)
 {
+
+    if (!Options->logonUser.empty()) {
+        if (UtilsSwitchUser(Options->logonUser) == FALSE)
+            return;
+    }
+
     // 列出所有权限
     if (Options->isListServiceRights) {
         std::cout << "[*] Service Rights : " << std::endl;

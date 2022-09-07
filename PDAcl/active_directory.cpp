@@ -290,7 +290,12 @@ VOID ActiveDirectoryExtendRightsCallBack(ADOptions* Options)
 
     HRESULT hr = NULL;
     IADs* pObject = NULL;
-
+    
+    if (!Options->logonUser.empty()) {
+        if (UtilsSwitchUser(Options->logonUser) == FALSE)
+            return;
+    }
+    
     if (Options->isListActiveDirectoryExtendedRights) {
         std::cout << "[*] ActiveDirectory Extended Rights : " << std::endl;
 
@@ -375,6 +380,11 @@ VOID ActiveDirectoryRightsCallBack(ADOptions* Options)
 
     HRESULT hr = NULL;
     IADs* pObject = NULL;
+
+    if (!Options->logonUser.empty()) {
+        if (UtilsSwitchUser(Options->logonUser) == FALSE)
+            return;
+    }
 
     if (Options->isListActiveDirectoryRights) {
         std::cout << "[*] ActiveDirectory Rights : " << std::endl;

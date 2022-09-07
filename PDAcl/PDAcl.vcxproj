@@ -145,11 +145,13 @@
     <ClCompile Include="active_directory.cpp" />
     <ClCompile Include="PDAcl.cpp" />
     <ClCompile Include="service.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="active_directory.h" />
     <ClInclude Include="CLI11.hpp" />
     <ClInclude Include="service.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

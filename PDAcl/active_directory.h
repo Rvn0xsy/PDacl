@@ -12,6 +12,7 @@
 #include <comdef.h>
 #include <wincred.h>
 #include <codecvt>
+#include "utils.h"
 
 #define ABANDON_REPLICATION L"{ee914b82-0a98-11d1-adbb-00c04fd8d5cd}"
 #define ADD_GUID L"{440820ad-65b4-11d1-a3da-0000f875ae0d}"
@@ -82,6 +83,7 @@ typedef struct ADOptions {
     std::string sActiveDirectoryRight = "";
     bool isActiveDirectoryRights = false;
     bool isListActiveDirectoryRights = false;
+    std::string logonUser = "";
 };
 
 

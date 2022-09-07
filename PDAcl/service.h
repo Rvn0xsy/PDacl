@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 #include <codecvt>
-
+#include "utils.h"
 
 typedef struct ServiceOptions{
     std::string sServiceName = "";
@@ -15,6 +15,7 @@ typedef struct ServiceOptions{
     bool isListServiceRights = false;
     bool isServiceAddRight = false;
     bool isServiceRemoveRight = false;
+    std::string logonUser = "";
 };
 
 

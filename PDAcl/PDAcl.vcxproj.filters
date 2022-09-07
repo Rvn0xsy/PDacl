@@ -8,6 +8,9 @@
     <ClCompile Include="service.cpp">
       <Filter>modules</Filter>
     </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>global</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLI11.hpp" />
@@ -17,10 +20,16 @@
     <ClInclude Include="service.h">
       <Filter>modules</Filter>
     </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>global</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modules">
       <UniqueIdentifier>{14e45090-1c53-40b6-abd8-0548cb4f49fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="global">
+      <UniqueIdentifier>{1f5b4b3b-5631-485a-8a1a-5a1705cf9ef1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
