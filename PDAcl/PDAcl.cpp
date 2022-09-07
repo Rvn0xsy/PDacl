@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     ServiceRights->add_option("-e,--extended-right", Service_options->sServiceRight, "Service Right");
     ServiceRights->add_option("-s,--service", Service_options->sServiceName, "ServiceName.");
     ServiceRights->add_flag("--list", Service_options->isListServiceRights, "List All Service Rights .");
-    ServiceRights->add_option("--login", AD_options->logonUser, "Login Use,e.g. Domain/Username@Password")->default_str("");
+    ServiceRights->add_option("--login", Service_options->logonUser, "Login Use,e.g. Domain/Username@Password")->default_str("");
 
     ServiceRights->callback([&]() {
         ServiceCallBack(Service_options);
